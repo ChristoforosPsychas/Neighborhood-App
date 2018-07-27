@@ -1,0 +1,33 @@
+html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+}
+
+
+#map {
+  width: 85vw;
+  height: 100vh;
+  left: 14.09vw;
+
+
+}
+
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+
+}
+
+.App-intro {
+  font-size: large;
+}
