@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Mapping from './Mapping.js'
 import ListView from './ListView.js'
+import escapeRegExp from 'escape-string-regexp'
 import './App.css';
 
 class App extends Component {
@@ -19,22 +20,59 @@ class App extends Component {
    markers: []
  }
 
-  handleClick = (e) => {
+ createMarkers = (map) => {
+   let infoWindow = new window.google.maps.InfoWindow();
+   const markers = this.state.markers.slice()
 
-  }
+   this.state.locations.map(location => {
+     let marker = new window.google.maps.Marker({
+       map: map,
+       position: location.location,
+       title: location.title,
+       animation: window.google.maps.Animation.DROP,
+       id: location.title
+     });
+     markers.push(marker)
 
-  createInfoWindows = (marker, infowindow, map) => {
-    if (infowindow.marker != marker) {
-      infowindow.marker = marker;
-      infowindow.setContent('<div>' + marker.title + '</div>');
-      infowindow.open(map, marker);
-      // Make sure the marker property is cleared if the infowindow is closed.
-      infowindow.addListener('closeclick',function(){
-        infowindow.setMarker = null;
-      });
-    }
-  }
+     this.setState({ markers })
 
+     marker.addListener('click',  () => {
+         this.createInfoWindows(marker, infoWindow, map)
+         this.bounce(marker)
+     })
+   })
+ }
+
+ createInfoWindows = (marker, infowindow, map) => {
+   if (infowindow.marker != marker) {
+     infowindow.marker = marker;
+     infowindow.setContent('<div>' + marker.title + '</div>');
+     infowindow.open(map, marker);
+     // Make sure the marker property is cleared if the infowindow is closed.
+     infowindow.addListener('closeclick',function(){
+       infowindow.setMarker = null;
+     });
+   }
+ }
+
+ bounce = (marker) => {
+   marker.setAnimation(window.google.maps.Animation.BOUNCE)
+   setTimeout(() => {
+     marker.setAnimation(null)
+   }, 1500)
+ }
+
+ getSearchedLocations = (query) => {
+   let locations
+   if (query) {
+     const match = new RegExp(escapeRegExp(query), 'i')
+     locations = this.state.locations.filter((location) => match.test(location.title))
+   } else {
+     locations = this.state.locations
+   }
+
+   this.setState({ locations })
+ }
 
 
   render() {
@@ -49,11 +87,11 @@ class App extends Component {
        <Mapping
           locations = {this.state.locations}
           markers = {this.state.markers}
-          createInfoWindows = {this.createInfoWindows}
+          createMarkers = {this.createMarkers}
        />
        <ListView
           locations = {this.state.locations}
-          createInfoWindows = {this.createInfoWindows}
+          getSearchedLocations = {this.getSearchedLocations}
        />
         </div>
     )

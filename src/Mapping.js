@@ -22,36 +22,9 @@ class Mapping extends Component {
       zoom: 12
     });
 
-    this.createMarkers(map)
+    this.props.createMarkers(map)
   }
 
-  createMarkers = (map) => {
-    let infoWindow = new window.google.maps.InfoWindow();
-
-    this.props.locations.map(location => {
-      let marker = new window.google.maps.Marker({
-        map: map,
-        position: location.location,
-        title: location.title,
-        animation: window.google.maps.Animation.DROP,
-        id: location.title
-      });
-      this.props.markers.push(marker)
-
-      marker.addListener('click',  () => {
-          this.props.createInfoWindows(marker, infoWindow, map)
-          this.bounce(marker)
-      })
-    })
-  }
-
-  bounce = (marker) => {
-    marker.setAnimation(window.google.maps.Animation.BOUNCE)
-    setTimeout(() => {
-      marker.setAnimation(null)
-    }, 1500)
-
-}
   render() {
     return(
       <div className="map-container">
