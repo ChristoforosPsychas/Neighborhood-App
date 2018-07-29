@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import Mapping from './Mapping.js'
 import ListView from './ListView.js'
-import escapeRegExp from 'escape-string-regexp'
+
 import './App.css';
 
 class App extends Component {
@@ -17,8 +17,21 @@ class App extends Component {
      {title: 'Square of King George', location: {lat: 38.246253, lng: 21.735066}},
      {title: 'Agios Vasileios', location: {lat: 38.313004, lng: 21.817007}}
    ],
-   markers: []
+   markers: [],
+   map: ''
  }
+
+ initMap = () => {
+   //https://stackoverflow.com/questions/43714895/google-is-not-defined-in-react-app-using-create-react-app
+   //window was required for this to work.
+   const map = new window.google.maps.Map(document.getElementById('map'), {
+     center: {lat: 38.24664, lng: 21.734574},
+     zoom: 12
+   });
+   this.setState({ map })
+   this.createMarkers(map)
+ }
+
 
  createMarkers = (map) => {
    let infoWindow = new window.google.maps.InfoWindow();
@@ -62,19 +75,6 @@ class App extends Component {
    }, 1500)
  }
 
- getSearchedLocations = (query) => {
-   let locations
-   if (query) {
-     const match = new RegExp(escapeRegExp(query), 'i')
-     locations = this.state.locations.filter((location) => match.test(location.title))
-   } else {
-     locations = this.state.locations
-   }
-
-   this.setState({ locations })
- }
-
-
   render() {
     return (
         <div className="App">
@@ -88,10 +88,12 @@ class App extends Component {
           locations = {this.state.locations}
           markers = {this.state.markers}
           createMarkers = {this.createMarkers}
+          initMap = {this.initMap}
        />
        <ListView
           locations = {this.state.locations}
-          getSearchedLocations = {this.getSearchedLocations}
+          markers = {this.state.markers}
+          map = {this.state.map}
        />
         </div>
     )
