@@ -7,7 +7,8 @@ class ListView extends Component {
   state = {
     query: '',
     searchedLocations: this.props.locations,
-    hideRestMarkers: this.props.markers
+    hideRestMarkers: this.props.markers,
+    currentMarker: ''
   }
 
   updateQuery = (query) => {
@@ -24,42 +25,53 @@ class ListView extends Component {
 
     if (query) {
       const match =  new RegExp(escapeRegExp(query), 'i')
-      console.log(match)
+      //console.log(match)
 
       searchedLocations = this.props.locations.filter(location =>
                 match.test(location.title))
 
-      console.log(searchedLocations)
+    //  console.log(searchedLocations)
 
        hideRestMarkers = this.props.markers.filter(marker =>
                  searchedLocations.every(location => location.title !== marker.title))
 
-      console.log(hideRestMarkers)
+   //console.log(hideRestMarkers)
+
+       this.props.markers.map(marker => marker.setVisible(true))
+
+    //console.log(this.props.markers)
 
        hideRestMarkers.map(marker => marker.setVisible(false))
         this.setState({searchedLocations, hideRestMarkers})
-      setTimeout(() => {
-        console.log(this.state.searchedLocations)
-        console.log(this.state.hideRestMarkers)
-      }, 1)
+
+      // setTimeout(() => {
+      //   console.log(this.state.searchedLocations)
+      //   console.log(this.state.hideRestMarkers)
+      // }, 1)
 
     } else {
       this.props.markers.forEach(marker => marker.setVisible(true))
       this.setState({searchedLocations: this.props.locations, hideRestMarkers: this.props.markers})
-      setTimeout(() => {
-        console.log(this.state.searchedLocations)
-        console.log(this.state.hideRestMarkers)
-      }, 1)
+
+      // setTimeout(() => {
+      //   console.log(this.state.searchedLocations)
+      //   console.log(this.state.hideRestMarkers)
+      // }, 1)
     }
 
   }
 
-  listItemClicked = (e,index) => {
-    e.preventDefault()
-    index = e.target.dataset.index
+  listItemClicked = (e) => {
+    let currentMarker
 
-    this.props.createInfoWindows(this.props.markers[index],this.props.infoWindow,this.props.map)
-    this.props.bounce(this.props.markers[index])
+    e.preventDefault()
+    currentMarker = e.target.dataset.index
+
+    console.log(currentMarker)
+    this.props.createInfoWindows(this.props.markers[currentMarker],this.props.infoWindow,this.props.map)
+    this.props.bounce(this.props.markers[currentMarker])
+
+    this.setState({ currentMarker })
   }
 
   // openInfo = (e) => {
@@ -70,14 +82,11 @@ class ListView extends Component {
 
   render() {
 
-
-
     /****************************************************************************************************************************
     *There is an attribute that you can add on all DOM element, it's the `data-*`                                               *
     *You can replace the `*` with anything you want that would be used as a label for the data you want to pass in this attribute*
     *In javascript, you can access the value you pass in using `element.dataset.*`                                              *
     *********************************************************  MUST READ !! ****************************************************/
-
 
     return(
       <div id='side-bar'>
@@ -108,10 +117,6 @@ class ListView extends Component {
               {location.title}
           </li>
         ))
-
-
-
-
 
         // this.props.markers.filter(marker => this.props.locations.map((location, index) =>
         //  match.test(location.title)
