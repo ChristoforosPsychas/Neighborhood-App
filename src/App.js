@@ -18,7 +18,8 @@ class App extends Component {
      {title: 'Agios Vasileios', location: {lat: 38.313004, lng: 21.817007}}
    ],
    markers: [],
-   map: ''
+   map: '',
+   infoWindow: ''
  }
 
  initMap = () => {
@@ -47,7 +48,7 @@ class App extends Component {
      });
      markers.push(marker)
 
-     this.setState({ markers })
+     this.setState({ markers, infoWindow })
 
      marker.addListener('click',  () => {
          this.createInfoWindows(marker, infoWindow, map)
@@ -61,6 +62,7 @@ class App extends Component {
      infowindow.marker = marker;
      infowindow.setContent('<div>' + marker.title + '</div>');
      infowindow.open(map, marker);
+     this.bounce(marker)
      // Make sure the marker property is cleared if the infowindow is closed.
      infowindow.addListener('closeclick',function(){
        infowindow.setMarker = null;
@@ -94,6 +96,9 @@ class App extends Component {
           locations = {this.state.locations}
           markers = {this.state.markers}
           map = {this.state.map}
+          infoWindow = {this.state.infoWindow}
+          createInfoWindows = {this.createInfoWindows}
+          bounce = {this.bounce}
        />
         </div>
     )

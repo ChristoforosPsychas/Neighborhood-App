@@ -23,27 +23,50 @@ class ListView extends Component {
     let hideRestMarkers
 
     if (query) {
-      const match =  new RegExp(escapeRegExp(this.state.query), 'i')
+      const match =  new RegExp(escapeRegExp(query), 'i')
+      console.log(match)
 
       searchedLocations = this.props.locations.filter(location =>
                 match.test(location.title))
-      hideRestMarkers = this.props.markers.filter(marker =>
-                searchedLocations.every(location => location.title !== marker.title))
-      hideRestMarkers.forEach(marker => marker.setVisible(false))
-      this.setState({searchedLocations, hideRestMarkers})
+
+      console.log(searchedLocations)
+
+       hideRestMarkers = this.props.markers.filter(marker =>
+                 searchedLocations.every(location => location.title !== marker.title))
+
+      console.log(hideRestMarkers)
+
+       hideRestMarkers.map(marker => marker.setVisible(false))
+        this.setState({searchedLocations, hideRestMarkers})
+      setTimeout(() => {
+        console.log(this.state.searchedLocations)
+        console.log(this.state.hideRestMarkers)
+      }, 1)
+
     } else {
       this.props.markers.forEach(marker => marker.setVisible(true))
       this.setState({searchedLocations: this.props.locations, hideRestMarkers: this.props.markers})
-
+      setTimeout(() => {
+        console.log(this.state.searchedLocations)
+        console.log(this.state.hideRestMarkers)
+      }, 1)
     }
 
   }
 
-  openInfo = (e) => {
+  listItemClicked = (e,index) => {
+    e.preventDefault()
+    index = e.target.dataset.index
 
-   document.querySelector('#gmimap'+e.target.dataset.index).firstElementChild.click();
+    this.props.createInfoWindows(this.props.markers[index],this.props.infoWindow,this.props.map)
+    this.props.bounce(this.props.markers[index])
+  }
 
- }
+  // openInfo = (e) => {
+  // document.addEventListener("DOMContentLoaded", function() {
+  //  document.querySelector('#gmimap'+e.target.dataset.index).firstElementChild.click();
+  //   })
+  // }
 
   render() {
 
@@ -80,7 +103,7 @@ class ListView extends Component {
           <li
               key={location.title}
               data-index={index}
-              onClick={this.openInfo}
+              onClick={event => this.listItemClicked(event)}
           >
               {location.title}
           </li>
