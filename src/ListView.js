@@ -8,7 +8,6 @@ class ListView extends Component {
     query: '',
     searchedLocations: this.props.locations,
     hideRestMarkers: this.props.markers,
-    currentMarker: ''
   }
 
   updateQuery = (query) => {
@@ -61,17 +60,16 @@ class ListView extends Component {
 
   }
 
-  listItemClicked = (e) => {
-    let currentMarker
+  listItemClicked = (location) => {
+    // e.preventDefault()
+    // index = e.target.dataset.index
 
-    e.preventDefault()
-    currentMarker = e.target.dataset.index
+    this.props.markers.map(marker => marker.title === location.title && this.props.createInfoWindows(marker))
 
-    console.log(currentMarker)
-    this.props.createInfoWindows(this.props.markers[currentMarker],this.props.infoWindow,this.props.map)
-    this.props.bounce(this.props.markers[currentMarker])
+    //this.props.createInfoWindows(this.props.markers[index],this.props.infoWindow,this.props.map)
+    //this.props.bounce(location.title)
 
-    this.setState({ currentMarker })
+    //this.setState({ currentMarker })
   }
 
   // openInfo = (e) => {
@@ -112,7 +110,7 @@ class ListView extends Component {
           <li
               key={location.title}
               data-index={index}
-              onClick={event => this.listItemClicked(event)}
+              onClick={() => this.listItemClicked(location)}
           >
               {location.title}
           </li>
