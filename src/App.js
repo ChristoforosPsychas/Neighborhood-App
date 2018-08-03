@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import Mapping from './Mapping.js'
 import ListView from './ListView.js'
+import Header from './Header.js'
+import Footer from './Footer.js'
 import fetchJsonp from 'fetch-jsonp';
-import scriptLoader from 'react-async-script-loader'
+
 import './App.css';
 
 class App extends Component {
@@ -66,14 +68,21 @@ class App extends Component {
      center: {lat: 38.24664, lng: 21.734574},
      zoom: 12
    });
-   this.setState({ map })
-   this.createMarkers(map)
+
+   let infoWindow = new window.google.maps.InfoWindow({
+     map: map,
+     maxWidth: 350
+   })
+
+   this.setState({ map, infoWindow })
+   this.createMarkers(map, infoWindow)
  }
 
 
- createMarkers = (map) => {
+ createMarkers = (map, infoWindow) => {
    //let infoWindow = new window.google.maps.InfoWindow();
    const markers = this.state.markers.slice()
+   //const infoWindows = this.state.infoWindows.slice()
    const bounds = new window.google.maps.LatLngBounds();
 
    this.state.locations.map(location => {
@@ -90,16 +99,22 @@ class App extends Component {
      this.setState({ markers })
 
      marker.addListener('click',  () => {
-         this.createInfoWindows(marker)
+         //infoWindows.map(infoWindow => infoWindow.setMarker = null)
+         if (infoWindow) infoWindow.close()
+         this.createInfoWindows(marker, infoWindow)
          this.bounce(marker)
+
      })
+    //this.setState({ infoWindows })
+     // console.log(infoWindows)
 
    })
    map.fitBounds(bounds)
  }
 
- createInfoWindows = (marker) => {
+ createInfoWindows = (marker, infoWindow) => {
    let location = marker.title
+   //const infoWindows = this.state.infoWindows.slice()
 
 
    let searchUrl = 'https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=1&explaintext=1&titles=' + location
@@ -143,22 +158,25 @@ class App extends Component {
           this.setState({content: pageFailed});
 
         }).then(() => {
-          let infoWindow = new window.google.maps.InfoWindow({
-            map: this.state.map,
-            title: marker.title,
-            maxWidth: 350,
-            content: this.state.content
-          })
+          // let infoWindow = new window.google.maps.InfoWindow({
+          //   map: this.state.map,
+          //   title: marker.title,
+          //   maxWidth: 350,
+          //   content: this.state.content
+          // })
+          //infoWindows.push(infoWindow)
+          //console.log(infoWindows)
+          infoWindow.setContent(this.state.content)
 
-          this.setState({ infoWindow })
+        //  this.setState({ infoWindows })
 
           if (window.screen.width >= 360 && window.screen.width < 500) {
-            infoWindow.maxWidth = 110
+              infoWindow.maxWidth = 110
           } else if (window.screen.width >= 500 && window.screen.width < 651) {
-            infoWindow.maxWidth = 200
+              infoWindow.maxWidth = 200
           }
 
-          this.state.infoWindow.open(this.state.map, marker);
+              infoWindow.open(this.state.map, marker);
 
         })
 
@@ -189,6 +207,7 @@ class App extends Component {
    // }
  }
 
+
  bounce = (marker) => {
    marker.setAnimation(window.google.maps.Animation.BOUNCE)
    setTimeout(() => {
@@ -199,21 +218,10 @@ class App extends Component {
   render() {
     return (
         <div className="App">
-          <header className="App-header">
-            <div className="icon-title-container" aria-label="Icon & Title">
-              <div className="button" aria-label="Button Container">
-                <button className="button-icon" aria-label="Toggle Location List">
-                  <img alt="Hamburger icon" src="https://i.imgur.com/YSPIKhL.png" />
-                </button>
-              </div>
-              <h1 className="App-title">
-                Mission Possible: Visiting Patra
-              </h1>
-            </div>
-          </header>
+          <Header />
           <main className="main-content" role="main">
             <Mapping
-                initMap = {this.initMap}
+              initMap = {this.initMap}
             />
             <ListView
               locations = {this.state.locations}
@@ -221,22 +229,10 @@ class App extends Component {
               createInfoWindows = {this.createInfoWindows}
               bounce = {this.bounce}
               visibleList = {this.state.visibleList}
+              infoWindow = {this.state.infoWindow}
             />
           </main>
-          <footer className="footer">
-            <p className="app-attribution" aria-label="Attribution">
-                This Neighborhood App was developed by Christoforos Psychas.<br/>
-                Dependencies used are the following:<br/>
-                Wikipedia API<br/>
-                Google Maps API<br/>
-                Icons made by Flaticon
-            </p>
-            <p className="icons-attribution" aria-label="Attribution">
-              Icons made by <a href="https://www.flaticon.com/authors/eleonor-wang" title="Eleonor Wang">Eleonor Wang</a>
-              from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
-              is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
-            </p>
-          </footer>
+          <Footer />
         </div>
     )
   }

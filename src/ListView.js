@@ -68,7 +68,7 @@ class ListView extends Component {
     //this.props.markers.map(marker => marker.title === location.title && this.props.createInfoWindows(marker))
     this.props.markers.map(function(marker) {
       if (marker.title === location.title) {
-        self.props.createInfoWindows(marker)
+        self.props.createInfoWindows(marker, self.props.infoWindow)
         self.props.bounce(marker)
       }
     })
