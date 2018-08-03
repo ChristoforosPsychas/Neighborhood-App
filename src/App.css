@@ -1,33 +1,222 @@
 html, body {
+        width: 100%;
         height: 100%;
-        margin: 0;
-        padding: 0;
+        font-family: "Source Code Pro", Monaco, "monospace";
 }
 
 
-#map {
-  width: 85vw;
-  height: 100vh;
-  left: 14.09vw;
-
-
+.icon-title-container {
+  display: flex;
+  padding: 10px 0 10px 0;
 }
+
+.button {
+  align-self: center;
+  width: 7%;
+}
+
+.menu-icon {
+  background-color: lightgray;
+}
+
+
 
 .App {
   text-align: center;
+  height: 100vh;
 }
 
 .App-header {
   background-color: #222;
-  height: 150px;
-  padding: 20px;
+  height: 73px;
   color: white;
+  width: 100%;
 }
 
 .App-title {
+  color: lightgray;
+  text-shadow: 1.5px 1px 1px gray;
+  width: 93%;
+  text-align: center;
+  font-weight: 450;
+  padding: 0;
+  margin: 0;
+}
+
+
+.main-content {
+  display: flex;
+  flex-direction: row;
+  height: 100vh;
+}
+
+#map-container {
+  width: 82%;
+  order: 1;
+}
+#map {
+  height: 100%;
+}
+
+#map-container.grow {
+  flex: 1 1;
+}
+
+#side-bar {
+   width: 18%;
+   background: linear-gradient(360deg, #02ccba 0%, #aa7ecd 100%);
+}
+
+#side-bar.hide {
+  display: none;
+}
+
+#input-filter {
+   display: flex;
+}
+
+.input-box {
+  font-size: 18px;
+  height: 30px;
+  flex: 1 1;
+  border: 3px solid #990000 ;
+}
+
+.li-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
 
 }
 
-.App-intro {
-  font-size: large;
+.li-item {
+  border: 3px double black;
+  padding: 10.8px 0;
+  font-size: 18px;
+}
+
+.li-item:hover {
+  cursor: pointer;
+  background-color: #3399FF;
+  font-style: italic;
+  font-weight: 450;
+
+}
+
+
+
+.footer {
+  background-color: black;
+  color: lightgray;
+}
+
+.app-attribution,.icons-attribution {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.icons-attribution {
+  font-size: 13px;
+  text-align: right;
+}
+
+
+/* Media Queries */
+
+@media screen and (min-width: 360px) and (max-width: 649px) {
+  .App-title {
+    font-size: 20px;
+    width: 75%;
+  }
+  .button {
+    width: 25%;
+  }
+  .input-box,.li-item {
+    font-size: 11px;
+  }
+  #side-bar {
+    width: 41%;
+  }
+  #map-container {
+    width: 59%;
+  }
+  .footer p,.icons-attribution {
+    font-size: 11px;
+  }
+  .icons-attribution {
+    text-align: center;
+  }
+  .gm-style .gm-style-iw{
+    max-height: 250px;
+    overflow: auto;
+    font-size: 10px;
+    word-break: break-all;
+  }
+}
+
+@media screen and (min-width: 360px) and (max-width: 800px) {
+  div.gm-style button:first-of-type {
+    top: 480px !important;
+  }
+  div.gmnoprint button:first-of-type {
+    top: 0px !important;
+  }
+  .gm-style-mtc {
+    top: 510px;
+  }
+}
+
+@media screen and (min-width: 650px) and (max-width: 999px) {
+  .App-title {
+    font-size: 25px;
+    width: 85%;
+  }
+  #side-bar {
+    width: 35%;
+  }
+  #map-container {
+    width: 65%;
+  }
+  .button {
+    width: 15%;
+  }
+  .input-box,.li-item {
+    font-size: 15px;
+  }
+  .footer p,.icons-attribution {
+    font-size: 15px;
+  }
+  .gm-style .gm-style-iw{
+    max-height: 250px;
+    overflow: auto;
+    word-break: break-all;
+    font-size: 13px;
+  }
+}
+
+@media screen and (min-width: 1000px) and (max-width: 1300px) {
+  .App-title {
+    font-size: 27px;
+    width: 88%;
+  }
+  #side-bar {
+    width: 25%;
+  }
+  #map-container {
+    width: 75%;
+  }
+  .button {
+    width: 12%;
+  }
+  .input-box,.li-item {
+    font-size: 16px;
+  }
+  .app-attribution,.icons-attribution {
+    font-size: 16px;
+  }
+  .gm-style .gm-style-iw{
+    max-height: 250px;
+    overflow: auto;
+    font-size: 15px;
+  }
 }

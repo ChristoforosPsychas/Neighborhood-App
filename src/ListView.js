@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import escapeRegExp from 'escape-string-regexp'
-
+import './App.css';
 
 class ListView extends Component {
 
@@ -63,9 +63,15 @@ class ListView extends Component {
   listItemClicked = (location) => {
     // e.preventDefault()
     // index = e.target.dataset.index
+    let self = this
 
-    this.props.markers.map(marker => marker.title === location.title && this.props.createInfoWindows(marker))
-
+    //this.props.markers.map(marker => marker.title === location.title && this.props.createInfoWindows(marker))
+    this.props.markers.map(function(marker) {
+      if (marker.title === location.title) {
+        self.props.createInfoWindows(marker)
+        self.props.bounce(marker)
+      }
+    })
     //this.props.createInfoWindows(this.props.markers[index],this.props.infoWindow,this.props.map)
     //this.props.bounce(location.title)
 
@@ -87,60 +93,36 @@ class ListView extends Component {
     *********************************************************  MUST READ !! ****************************************************/
 
     return(
-      <div id='side-bar'>
-        <input
-          id='input-box'
-          type='text'
-          placeholder='Enter main sight'
-          value={this.state.query}
-          onChange={(event) => this.updateQuery(event.target.value)}
-      />
-      <ul>
-      {
-        // this.props.locations.map((location, index) => {
-        //   this.props.markers.filter(marker => {
-        //    match.test(location.title).filter(marker => {
-        //      //https://stackoverflow.com/questions/5030127/marker-visibility-in-google-maps
-        //      marker.title !== location.title
-        //      marker.setVisible(false)
-        //    }
-        //
-        //  )})
-        this.state.searchedLocations.map((location, index) => (
-          <li
-              key={location.title}
-              data-index={index}
-              onClick={() => this.listItemClicked(location)}
-          >
-              {location.title}
-          </li>
-        ))
-
-        // this.props.markers.filter(marker => this.props.locations.map((location, index) =>
-        //  match.test(location.title)
-        //
-        //  .filter(location =>
-        // location.title !== marker.title && (
-        //     <li
-        //       data-index={index}
-        //       onClick={this.openInfo}
-        //     >
-        //       {location.title}
-        //     </li>)
-        //   ))
-        // )
-
-      //})
-    }
-      </ul>
-      </div>
-      /*this.props.locations.map((location, index) => {
-        match.test(location.title) && (
-        this.props.markers.filter(marker => (
-          marker.title === location.title ?
-          marker.setMap(this.props.map) : marker.setMap(null)
-        )))*/
-
+      <nav id='side-bar'>
+        <form>
+          <div id="input-filter" aria-label="Input">
+            <input
+              className="input-box"
+              aria-labelledby="input-filter"
+              type='text'
+              placeholder='Enter map sight...'
+              value={this.state.query}
+              onChange={(event) => this.updateQuery(event.target.value)}
+            />
+          </div>
+        </form>
+        <ul className="li-list" aria-label="List of locations" role="menubar">
+          {
+            this.state.searchedLocations.map(location => (
+              <li
+                  className="li-item"
+                  role="menuitem"
+                  tabIndex={this.props.visibleList ? '0' : '-1'}
+                  key={location.title}
+                  onClick={() => this.listItemClicked(location)}
+                  onKeyPress={() => this.listItemClicked(location)}
+              >
+                  {location.title}
+              </li>
+              ))
+          }
+        </ul>
+      </nav>
     )
   }
 }

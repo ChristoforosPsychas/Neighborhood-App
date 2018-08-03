@@ -8,20 +8,43 @@ class App extends Component {
  state = {
    locations: [
      {title: 'Rio–Antirrio bridge', location: {lat: 38.320591, lng: 21.773711}},
-     {title: 'Saint Andrew Cathedral Church', location: {lat:  38.242382, lng: 21.727836}},
-     {title: 'Castle of Patras', location: {lat: 38.245297, lng: 21.743029}},
+     {title: "St Andrew's Cathedral, Patras", location: {lat:  38.242382, lng: 21.727836}},
+     {title: 'Patras Castle', location: {lat: 38.245297, lng: 21.743029}},
+     {title: 'Apollon Theatre (Patras)', location: {lat: 38.246472, lng: 21.735329}},
+     {title: 'Achaia Clauss', location: {lat: 38.196911, lng: 21.769676}},
+     {title: 'Archaeological Museum of Patras', location: {lat:  38.263523, lng: 21.752453}},
+     {title: 'Patras Lighthouse', location: {lat: 38.245078, lng: 21.72559}},
+     {title: 'Georgiou I Square', location: {lat: 38.246253, lng: 21.735066}},
      {title: 'Panepistioupoli Patron', location: {lat: 38.28923, lng: 21.785369}},
      {title: 'Romaiko Odio Patras', location: {lat: 38.243329, lng: 21.738134}},
-     {title: 'Archaeological Museum of Patras', location: {lat:  38.263523, lng: 21.752453}},
-     {title: 'Dasyllio', location: {lat: 38.249149, lng: 21.743604}},
-     {title: 'Square of King George', location: {lat: 38.246253, lng: 21.735066}},
-     {title: 'Agios Vasileios', location: {lat: 38.313004, lng: 21.817007}}
+     {title: 'Dasyllio Patras', location: {lat: 38.249149, lng: 21.743604}}
    ],
    markers: [],
    map: '',
-   infoWindow: '',
-   content: ''
+   content: '',
+   visibleList: true
  }
+
+ componentDidMount() {
+   const button = document.querySelector(".button-icon");
+   button.addEventListener('click', this.showMenu);
+ }
+
+ showMenu = () => {
+   const nav = document.querySelector("#side-bar");
+   const mapContainer = document.querySelector("#map-container");
+   nav.classList.toggle("hide");
+   mapContainer.classList.toggle("grow");
+
+   let hide = nav.classList.contains("hide")
+
+   if (hide) {
+     this.setState({ visibleList: false})
+   } else {
+     this.setState({ visibleList: true})
+   }
+ }
+
 
  initMap = () => {
    //https://stackoverflow.com/questions/43714895/google-is-not-defined-in-react-app-using-create-react-app
@@ -38,6 +61,7 @@ class App extends Component {
  createMarkers = (map) => {
    //let infoWindow = new window.google.maps.InfoWindow();
    const markers = this.state.markers.slice()
+   const bounds = new window.google.maps.LatLngBounds();
 
    this.state.locations.map(location => {
      let marker = new window.google.maps.Marker({
@@ -48,6 +72,7 @@ class App extends Component {
        id: location.title
      });
      markers.push(marker)
+     bounds.extend(marker.position)
 
      this.setState({ markers })
 
@@ -57,11 +82,12 @@ class App extends Component {
      })
 
    })
-
+   map.fitBounds(bounds)
  }
 
  createInfoWindows = (marker) => {
    let location = marker.title
+
 
    let searchUrl = 'https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=1&explaintext=1&titles=' + location
    searchUrl = searchUrl.replace(/ /g, '%20');
@@ -76,42 +102,63 @@ class App extends Component {
      https://www.mediawiki.org/wiki/API:Main_page
      https://www.mediawiki.org/w/api.php?action=help&modules=query%2Bextracts
      Package fetch JSONP: https://www.npmjs.com/package/fetch-jsonp
-     
+
      ****************************************************************************/
+     /*********************WIKIPEDIA API*********************************/
+     /*** Wikipedia API was implemented with the help of the above links and with the following video: *******/
+     /*** https://www.youtube.com/watch?v=RPz75gcHj18&t=1221s ****/
+
      fetchJsonp(searchUrl)
         .then((response) => {
+
           return response.json()
+
         }).then((data) => {
 
           let pages = data.query.pages
           let pageId = Object.keys(data.query.pages)[0]
           let content = pages[pageId].extract
-          console.log(content)
+
+          if (!content) content = 'No Information Available'
 
           this.setState({content});
 
         }).catch((err) => {
-          let pageFailed = 'Parsing failed: ' + err;
+
+          let pageFailed = 'Request failed: ' + err;
+
           this.setState({content: pageFailed});
+
+        }).then(() => {
+          let infoWindow = new window.google.maps.InfoWindow({
+            map: this.state.map,
+            title: marker.title,
+            maxWidth: 350,
+            content: this.state.content
+          })
+
+          if (window.screen.width >= 360 && window.screen.width < 500) {
+            infoWindow.maxWidth = 110
+          } else if (window.screen.width >= 500 && window.screen.width < 651) {
+            infoWindow.maxWidth = 200
+          }
+
+
+          // if (marker) {
+          //   console.log(marker)
+          //   console.log(infoWindow)
+          //   infoWindow.marker = marker;
+          //   infoWindow.open(this.state.map, marker);
+          //   console.log("true")
+          //   infoWindow.addListener('closeclick',function(){
+          //       infoWindow.setMarker = null;
+          //     });
+          // } else {
+          //   infoWindow.close()
+          // }
         })
-
+    /********************************************************/
    //infoWindow = new window.google.maps.InfoWindow({  })
-
-   let infoWindow = new window.google.maps.InfoWindow({
-     map: this.state.map,
-     title: marker.title,
-     maxWidth: 200,
-     content: this.state.content
-   })
-
-   this.setState({ infoWindow })
-
-   setTimeout(() => {
-      console.log(this.state.infoWindow)
-    }, 1)
-
-   infoWindow.open(this.state.map, marker);
-
 
 
    // if (infowindow.marker != marker) {
@@ -136,22 +183,43 @@ class App extends Component {
     return (
         <div className="App">
           <header className="App-header">
-            <h1 className="App-title">
-              Mission Possible: Visiting Patra
-            </h1>
+            <div className="icon-title-container" aria-label="Icon & Title">
+              <div className="button" aria-label="Button Container">
+                <button className="button-icon" aria-label="Toggle Location List">
+                  <img alt="Hamburger icon" src="https://i.imgur.com/YSPIKhL.png" />
+                </button>
+              </div>
+              <h1 className="App-title">
+                Mission Possible: Visiting Patra
+              </h1>
+            </div>
           </header>
-
-       <Mapping
-          initMap = {this.initMap}
-       />
-       <ListView
-          locations = {this.state.locations}
-          markers = {this.state.markers}
-          map = {this.state.map}
-          infoWindow = {this.state.infoWindow}
-          createInfoWindows = {this.createInfoWindows}
-          bounce = {this.bounce}
-       />
+          <main className="main-content" role="main">
+            <Mapping
+              initMap = {this.initMap}
+            />
+            <ListView
+              locations = {this.state.locations}
+              markers = {this.state.markers}
+              createInfoWindows = {this.createInfoWindows}
+              bounce = {this.bounce}
+              visibleList = {this.state.visibleList}
+            />
+          </main>
+          <footer className="footer">
+            <p className="app-attribution" aria-label="Attribution">
+                This Neighborhood App was developed by Christoforos Psychas.<br/>
+                Dependencies used are the following:<br/>
+                Wikipedia API<br/>
+                Google Maps API<br/>
+                Icons made by Flaticon
+            </p>
+            <p className="icons-attribution" aria-label="Attribution">
+              Icons made by <a href="https://www.flaticon.com/authors/eleonor-wang" title="Eleonor Wang">Eleonor Wang</a>
+              from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
+              is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+            </p>
+          </footer>
         </div>
     )
   }

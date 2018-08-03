@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import scriptLoader from 'react-async-script-loader'
-
 import './App.css';
+
 
 class Mapping extends Component {
 
@@ -14,16 +14,13 @@ class Mapping extends Component {
   }
 }
 
-
-
   render() {
     return(
-      <div className="map-container">
-        <div id="map">
+      <div id="map-container">
+        <div id="map" role="application">
 
         </div>
       </div>
-
     )
   }
 }
