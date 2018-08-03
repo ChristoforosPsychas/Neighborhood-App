@@ -60,6 +60,7 @@ html, body {
 
 #error {
   color: black;
+  text-align: center;
 }
 
 #map-container.grow {

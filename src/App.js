@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Mapping from './Mapping.js'
 import ListView from './ListView.js'
 import fetchJsonp from 'fetch-jsonp';
+import scriptLoader from 'react-async-script-loader'
 import './App.css';
 
 class App extends Component {
@@ -24,8 +25,7 @@ class App extends Component {
    content: '',
    visibleList: true,
    isOpen: false,
-   loadMapFailed: false,
-   infoWindow: {}
+   infoWindow: ''
  }
 
  componentDidMount() {
@@ -35,11 +35,10 @@ class App extends Component {
    window.gm_authFailure = this.gm_authFailure
  }
 
+
  gm_authFailure = () => {
 
-   this.setState({ loadMapFailed: true })
-
-   alert('Loading map failed. Please try again.')
+   alert('Loading map failed. Authentication incorrect. Please try again.')
 
  }
 
@@ -158,27 +157,22 @@ class App extends Component {
           } else if (window.screen.width >= 500 && window.screen.width < 651) {
             infoWindow.maxWidth = 200
           }
-        }).then(() => {
-          if (!this.state.isOpen) {
+
+          this.state.infoWindow.open(this.state.map, marker);
+
+        })
+
             //const infowindow = this.state.infoWindow.slice()
-            console.log(this.state.infoWindow)
+
           //  console.log(infoWindow)
             //infoWindow.marker = marker;
-            this.state.infoWindow.open(this.state.map, marker);
-            console.log("true")
+
+
             // infowindow.addListener('closeclick',function(){
             //     infowindow.setMarker = null;
             //   });
 
-            this.setState({ isOpen: true })
-          } else {
-            this.state.infoWindow.close()
-
-            this.setState({ isOpen: false })
-          }
-        })
-
-
+            //this.state.infoWindow.close()
 
     /********************************************************/
    //infoWindow = new window.google.maps.InfoWindow({  })
@@ -219,8 +213,7 @@ class App extends Component {
           </header>
           <main className="main-content" role="main">
             <Mapping
-              initMap = {this.initMap}
-              loadMapFailed = {this.state.loadMapFailed}
+                initMap = {this.initMap}
             />
             <ListView
               locations = {this.state.locations}
