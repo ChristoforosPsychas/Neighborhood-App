@@ -22,13 +22,27 @@ class App extends Component {
    markers: [],
    map: '',
    content: '',
-   visibleList: true
+   visibleList: true,
+   isOpen: false,
+   loadMapFailed: false,
+   infoWindow: {}
  }
 
  componentDidMount() {
    const button = document.querySelector(".button-icon");
    button.addEventListener('click', this.showMenu);
+
+   window.gm_authFailure = this.gm_authFailure
  }
+
+ gm_authFailure = () => {
+
+   this.setState({ loadMapFailed: true })
+
+   alert('Loading map failed. Please try again.')
+
+ }
+
 
  showMenu = () => {
    const nav = document.querySelector("#side-bar");
@@ -137,26 +151,35 @@ class App extends Component {
             content: this.state.content
           })
 
+          this.setState({ infoWindow })
+
           if (window.screen.width >= 360 && window.screen.width < 500) {
             infoWindow.maxWidth = 110
           } else if (window.screen.width >= 500 && window.screen.width < 651) {
             infoWindow.maxWidth = 200
           }
+        }).then(() => {
+          if (!this.state.isOpen) {
+            //const infowindow = this.state.infoWindow.slice()
+            console.log(this.state.infoWindow)
+          //  console.log(infoWindow)
+            //infoWindow.marker = marker;
+            this.state.infoWindow.open(this.state.map, marker);
+            console.log("true")
+            // infowindow.addListener('closeclick',function(){
+            //     infowindow.setMarker = null;
+            //   });
 
+            this.setState({ isOpen: true })
+          } else {
+            this.state.infoWindow.close()
 
-          // if (marker) {
-          //   console.log(marker)
-          //   console.log(infoWindow)
-          //   infoWindow.marker = marker;
-          //   infoWindow.open(this.state.map, marker);
-          //   console.log("true")
-          //   infoWindow.addListener('closeclick',function(){
-          //       infoWindow.setMarker = null;
-          //     });
-          // } else {
-          //   infoWindow.close()
-          // }
+            this.setState({ isOpen: false })
+          }
         })
+
+
+
     /********************************************************/
    //infoWindow = new window.google.maps.InfoWindow({  })
 
@@ -197,6 +220,7 @@ class App extends Component {
           <main className="main-content" role="main">
             <Mapping
               initMap = {this.initMap}
+              loadMapFailed = {this.state.loadMapFailed}
             />
             <ListView
               locations = {this.state.locations}

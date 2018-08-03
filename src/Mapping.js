@@ -18,7 +18,15 @@ class Mapping extends Component {
     return(
       <div id="map-container">
         <div id="map" role="application">
+         {console.log(this.props.loadMapFailed)}
+          {this.props.loadMapFailed && (
 
+              <p id="error">
+                The map did not load successfully.<br/>
+                Please come later.
+              </p>
+
+          )}
         </div>
       </div>
     )

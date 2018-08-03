@@ -58,6 +58,10 @@ html, body {
   height: 100%;
 }
 
+#error {
+  color: black;
+}
+
 #map-container.grow {
   flex: 1 1;
 }
