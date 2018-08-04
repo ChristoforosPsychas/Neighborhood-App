@@ -26,3 +26,8 @@ To get started:
 # Credits
 
 I would like to thank the Udacity Slack Community for their great help on completing this project and Udacity for providing the React courses. 
+
+
+### Notes
+Providing attribution for the 3rd party API: Wikipedia API used.
+
