@@ -6,15 +6,17 @@ import './App.css';
 class Mapping extends Component {
 
   state = {
+    /* Simple boolean variable when the map fails to load */
     loadMapFailed: false
   }
-
+  /* Idea taken from here: https://stackoverflow.com/questions/41709765/how-to-load-the-google-maps-api-script-in-my-react-app-only-when-it-is-require */
   componentWillReceiveProps ({ isScriptLoaded, isScriptLoadSucceed }) {
   if (isScriptLoaded && !this.props.isScriptLoaded) { // load finished
     if (isScriptLoadSucceed) {
       this.props.initMap()
     }
     else {
+      /* If the map fails, make the variable true */
       this.setState(() => ({
            loadMapFailed: true
          })
@@ -28,7 +30,7 @@ class Mapping extends Component {
     return(
       <div id="map-container">
         <div id="map" role="application">
-          {this.state.loadMapFailed === true && (
+          {this.state.loadMapFailed === true && ( /* Make the custom p tag appears in the place of the map */
 
               <p id="error">
                 The map did not load successfully.<br/>
@@ -41,6 +43,7 @@ class Mapping extends Component {
     )
   }
 }
+/* We use the scriptloader from the react-async-sciptloader package */
 export default scriptLoader (
-  ["https://maps.googleapis.com/maps/api/js?key=AIzaSyAZi1ZJwzOn-3UOAM8fJ2yiQ4BMt7-Ge20"]
+  ["https://maps.googleapis.com/maps/api/js?key=AIzaSyCtHhaVCdZU5d8QduMfcHZE1P-cHYnpoRg"]
 )(Mapping)

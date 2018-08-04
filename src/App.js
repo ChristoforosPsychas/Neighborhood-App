@@ -8,6 +8,8 @@ import fetchJsonp from 'fetch-jsonp';
 import './App.css';
 
 class App extends Component {
+ /* My state. It holds an array of my locations, an array of markers, my map, my infowindow's content,
+    a boolean for the visibility of the list and my infowindow */
  state = {
    locations: [
      {title: 'Rio–Antirrio bridge', location: {lat: 38.320591, lng: 21.773711}},
@@ -26,11 +28,11 @@ class App extends Component {
    map: '',
    content: '',
    visibleList: true,
-   isOpen: false,
    infoWindow: ''
  }
 
  componentDidMount() {
+   /* Adding a listener to my button which it will show or hide the locations list  */
    const button = document.querySelector(".button-icon");
    button.addEventListener('click', this.showMenu);
 
@@ -38,13 +40,17 @@ class App extends Component {
  }
 
 
+ /* Google Maps function for authentication errors */
  gm_authFailure = () => {
 
    alert('Loading map failed. Authentication incorrect. Please try again.')
 
  }
 
-
+ /* Function for the listener for the button.
+ I find the elements in the DOM, and toggle some classes to hide or show the locations list
+ Lastly, i create a hide boolean variable to check if my nav element contains the hide class
+ This is done for ARIA purposes for the tabindex *Check ListView file->render->li*  */
  showMenu = () => {
    const nav = document.querySelector("#side-bar");
    const mapContainer = document.querySelector("#map-container");
@@ -60,7 +66,7 @@ class App extends Component {
    }
  }
 
-
+ /* Initialise Google Maps, giving a center and showing the city of Patras, Greece  */
  initMap = () => {
    //https://stackoverflow.com/questions/43714895/google-is-not-defined-in-react-app-using-create-react-app
    //window was required for this to work.
@@ -78,13 +84,12 @@ class App extends Component {
    this.createMarkers(map, infoWindow)
  }
 
-
+ /* Creation of my markers */
  createMarkers = (map, infoWindow) => {
-   //let infoWindow = new window.google.maps.InfoWindow();
    const markers = this.state.markers.slice()
-   //const infoWindows = this.state.infoWindows.slice()
    const bounds = new window.google.maps.LatLngBounds();
 
+   /* Map through all locations and create each marker */
    this.state.locations.map(location => {
      let marker = new window.google.maps.Marker({
        map: map,
@@ -93,35 +98,28 @@ class App extends Component {
        animation: window.google.maps.Animation.DROP,
        id: location.title
      });
+     /* Push each marker into an array of markers */
      markers.push(marker)
      bounds.extend(marker.position)
 
      this.setState({ markers })
-
+     /* Create a listener for each marker on click*/
      marker.addListener('click',  () => {
-         //infoWindows.map(infoWindow => infoWindow.setMarker = null)
          if (infoWindow) infoWindow.close()
          this.createInfoWindows(marker, infoWindow)
          this.bounce(marker)
 
      })
-    //this.setState({ infoWindows })
-     // console.log(infoWindows)
-
    })
    map.fitBounds(bounds)
  }
-
+ /* Creation of the infowindows */
  createInfoWindows = (marker, infoWindow) => {
    let location = marker.title
-   //const infoWindows = this.state.infoWindows.slice()
-
-
    let searchUrl = 'https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&exintro=1&explaintext=1&titles=' + location
    searchUrl = searchUrl.replace(/ /g, '%20');
 
-     console.log(searchUrl)
-     /*****Sources with information about WIKIPEDIA API***********************
+     /***********************************Sources with information about WIKIPEDIA API**********************************************
 
      https://stackoverflow.com/questions/8555320/is-there-a-clean-wikipedia-api-just-for-retrieve-content-summary
      https://stackoverflow.com/questions/7185288/how-to-get-wikipedia-content-using-wikipedias-api
@@ -129,85 +127,54 @@ class App extends Component {
      https://stackoverflow.com/questions/35760164/get-random-wikipedia-extract-with-ajax
      https://www.mediawiki.org/wiki/API:Main_page
      https://www.mediawiki.org/w/api.php?action=help&modules=query%2Bextracts
+
+     Fetch doesnt support jsonp. After trial and error and much searching, i found a package with a special fetch, fetchJsonp.
      Package fetch JSONP: https://www.npmjs.com/package/fetch-jsonp
 
-     ****************************************************************************/
-     /*********************WIKIPEDIA API*********************************/
-     /*** Wikipedia API was implemented with the help of the above links and with the following video: *******/
-     /*** https://www.youtube.com/watch?v=RPz75gcHj18&t=1221s ****/
+     *****************************************************************************************************************************/
 
+     /*********************WIKIPEDIA API*********************************/
+     /*** Wikipedia API was implemented with the help of the above links and with the following video: ***/
+     /*** https://www.youtube.com/watch?v=RPz75gcHj18&t=1221s ***/
+
+     /* Fetching from the API of WIKIPEDIA */
      fetchJsonp(searchUrl)
         .then((response) => {
 
           return response.json()
 
         }).then((data) => {
-
+          /* Retrieve content from the above response as per shown in the video */
           let pages = data.query.pages
           let pageId = Object.keys(data.query.pages)[0]
           let content = pages[pageId].extract
-
+          /* If the page of wikipedia doesnt contain data of the place, set content the following message */
           if (!content) content = 'No Information Available'
 
           this.setState({content});
 
         }).catch((err) => {
 
-          let pageFailed = 'Request failed: ' + err;
+          let pageFailed = 'Request failed: ' + err
 
           this.setState({content: pageFailed});
-
+          /* After i store the content into the state, i set the content of my infowindow to that value */
         }).then(() => {
-          // let infoWindow = new window.google.maps.InfoWindow({
-          //   map: this.state.map,
-          //   title: marker.title,
-          //   maxWidth: 350,
-          //   content: this.state.content
-          // })
-          //infoWindows.push(infoWindow)
-          //console.log(infoWindows)
+
           infoWindow.setContent(this.state.content)
-
-        //  this.setState({ infoWindows })
-
+          /* If - else statement to adjust the infowindow's maxwidth depending on the view port */
           if (window.screen.width >= 360 && window.screen.width < 500) {
               infoWindow.maxWidth = 110
           } else if (window.screen.width >= 500 && window.screen.width < 651) {
               infoWindow.maxWidth = 200
           }
-
-              infoWindow.open(this.state.map, marker);
+          /* Finally i open the infowindow with the map and the marker */
+          infoWindow.open(this.state.map, marker);
 
         })
-
-            //const infowindow = this.state.infoWindow.slice()
-
-          //  console.log(infoWindow)
-            //infoWindow.marker = marker;
-
-
-            // infowindow.addListener('closeclick',function(){
-            //     infowindow.setMarker = null;
-            //   });
-
-            //this.state.infoWindow.close()
-
-    /********************************************************/
-   //infoWindow = new window.google.maps.InfoWindow({  })
-
-
-   // if (infowindow.marker != marker) {
-   //   infowindow.marker = marker;
-   //   infowindow.setContent('<div>' + marker.title + '</div>');
-   //   infowindow.open(map, marker);
-   //   // Make sure the marker property is cleared if the infowindow is closed.
-   //   infowindow.addListener('closeclick',function(){
-   //     infowindow.setMarker = null;
-   //   });
-   // }
  }
 
-
+ /* Simple function for the bounce. When the marker is clicked, i set the Animation of the marker to bounce for some time */
  bounce = (marker) => {
    marker.setAnimation(window.google.maps.Animation.BOUNCE)
    setTimeout(() => {

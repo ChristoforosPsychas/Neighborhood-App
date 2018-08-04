@@ -3,13 +3,15 @@ import escapeRegExp from 'escape-string-regexp'
 import './App.css';
 
 class ListView extends Component {
-
+  /* My state in the ListView component. It contains the query of the search, an array of my searched locations and
+     an array of the hidden markers */
   state = {
     query: '',
     searchedLocations: this.props.locations,
     hideRestMarkers: this.props.markers,
   }
 
+  /* Function that updates the query on change and calls the function that updates the locations */
   updateQuery = (query) => {
 
     this.setState({ query })
@@ -17,81 +19,48 @@ class ListView extends Component {
     this.updateLocations(query)
 
   }
-
+  /* Function that updates the location based on the given query */
   updateLocations = (query) => {
     let searchedLocations
     let hideRestMarkers
-
+    /* If there is a query */
     if (query) {
+      /* Create a match variable with the expression of the query */
       const match =  new RegExp(escapeRegExp(query), 'i')
-      //console.log(match)
-
+      /* Filter the locations with that match and store the results in the searchedLocations variable */
       searchedLocations = this.props.locations.filter(location =>
                 match.test(location.title))
-
-    //  console.log(searchedLocations)
-
-       hideRestMarkers = this.props.markers.filter(marker =>
+      /* For every searched location, check if the location's title matches every marker's title. If not, filter out those markers.
+         The result in the hideRestMarkers variable is the hidden markers */
+      hideRestMarkers = this.props.markers.filter(marker =>
                  searchedLocations.every(location => location.title !== marker.title))
-
-   //console.log(hideRestMarkers)
-
-       this.props.markers.map(marker => marker.setVisible(true))
-
-    //console.log(this.props.markers)
-
-       hideRestMarkers.map(marker => marker.setVisible(false))
-        this.setState({searchedLocations, hideRestMarkers})
-
-      // setTimeout(() => {
-      //   console.log(this.state.searchedLocations)
-      //   console.log(this.state.hideRestMarkers)
-      // }, 1)
-
+      /* Make all markers visible */
+      this.props.markers.map(marker => marker.setVisible(true))
+      /* Make the hidden markers actually hidden */
+      hideRestMarkers.map(marker => marker.setVisible(false))
+      /* Update the state with the correct values */
+      this.setState({searchedLocations, hideRestMarkers})
+      /* Else if there is not a query (empty query) */
     } else {
-      this.props.markers.forEach(marker => marker.setVisible(true))
-      this.setState({searchedLocations: this.props.locations, hideRestMarkers: this.props.markers})
-
-      // setTimeout(() => {
-      //   console.log(this.state.searchedLocations)
-      //   console.log(this.state.hideRestMarkers)
-      // }, 1)
+        /* Make all markers visible and update the state */
+        this.props.markers.forEach(marker => marker.setVisible(true))
+        this.setState({searchedLocations: this.props.locations, hideRestMarkers: this.props.markers})
     }
-
   }
-
+  /* Function when a li item is clicked.
+     It maps over the markers and if there is a match, create an infowindow and make the marker bounce */
   listItemClicked = (location) => {
-    // e.preventDefault()
-    // index = e.target.dataset.index
     let self = this
 
-    //this.props.markers.map(marker => marker.title === location.title && this.props.createInfoWindows(marker))
     this.props.markers.map(function(marker) {
       if (marker.title === location.title) {
         self.props.createInfoWindows(marker, self.props.infoWindow)
         self.props.bounce(marker)
       }
     })
-    //this.props.createInfoWindows(this.props.markers[index],this.props.infoWindow,this.props.map)
-    //this.props.bounce(location.title)
-
-    //this.setState({ currentMarker })
   }
 
-  // openInfo = (e) => {
-  // document.addEventListener("DOMContentLoaded", function() {
-  //  document.querySelector('#gmimap'+e.target.dataset.index).firstElementChild.click();
-  //   })
-  // }
-
   render() {
-
-    /****************************************************************************************************************************
-    *There is an attribute that you can add on all DOM element, it's the `data-*`                                               *
-    *You can replace the `*` with anything you want that would be used as a label for the data you want to pass in this attribute*
-    *In javascript, you can access the value you pass in using `element.dataset.*`                                              *
-    *********************************************************  MUST READ !! ****************************************************/
-
     return(
       <nav id='side-bar'>
         <form>
@@ -107,15 +76,16 @@ class ListView extends Component {
           </div>
         </form>
         <ul className="li-list" aria-label="List of locations" role="menubar">
-          {
+          { /* Map over the searched locations and create for each, a list item */
             this.state.searchedLocations.map(location => (
               <li
                   className="li-item"
                   role="menuitem"
-                  tabIndex={this.props.visibleList ? '0' : '-1'}
+                  tabIndex={this.props.visibleList ? '0' : '-1'} /*Adjust the tabindex depending on whether the sidebar is visible or not*/
                   key={location.title}
                   onClick={() => this.listItemClicked(location)}
-                  onKeyPress={() => this.listItemClicked(location)}
+                  onKeyPress={() => this.listItemClicked(location)} /* For ARIA purposes. The user must be able to press a key
+                                                                       to select a list item, not only click it. */
               >
                   {location.title}
               </li>
