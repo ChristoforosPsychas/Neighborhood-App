@@ -22,3 +22,7 @@ To get started:
 * Run `npm start` and the developer version of the project will run at `localhost:3000`
 
 
+
+# Credits
+
+I would like to thank the Udacity Slack Community for their great help on completing this project and Udacity for providing the React courses. 
